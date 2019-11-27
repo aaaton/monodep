@@ -5,7 +5,7 @@ api:
 db:
   path: ./db
   deps:
-    - schema
+    - schemas
 schemas:
     path: ./schemas
     deps: []
