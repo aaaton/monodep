@@ -1,0 +1,11 @@
+api:
+  path: ./api
+  deps:
+    - db
+db:
+  path: ./db
+  deps:
+    - schema
+schemas:
+    path: ./schemas
+    deps: []
