@@ -36,11 +36,13 @@ func main() {
 	depMap := make(DepMap)
 	data, err := ioutil.ReadFile(yamlFile)
 	if err != nil {
-		panic(err)
+		fmt.Println("can't find the specified yaml file:", yamlFile)
+		os.Exit(1)
 	}
 	err = yaml.Unmarshal([]byte(data), &depMap)
 	if err != nil {
-		panic(err)
+		fmt.Println("can't parse the yaml file:", err)
+		os.Exit(1)
 	}
 	baseDir := path.Dir(yamlFile)
 	for name, dep := range depMap {
@@ -59,14 +61,10 @@ func main() {
 	reader := bufio.NewReader(cmdOutput)
 	line, _, err := reader.ReadLine()
 	for err == nil {
-		fmt.Println(string(line))
 		fileDir := path.Dir(string(line))
 		for _, dep := range depMap {
 			if strings.Contains(fileDir, dep.Path) {
 				dep.changed = true
-				fmt.Println("Dep has changed:", dep.Name)
-			} else {
-				fmt.Println("Dep has not changed:", dep.Path)
 			}
 		}
 		line, _, err = reader.ReadLine()
@@ -84,11 +82,13 @@ func (m DepMap) checkDeps() {
 	for _, d := range m {
 		for _, dep := range d.Deps {
 			if _, ok := m[dep]; !ok {
-				panic(d.Name + " is depending on " + dep + ", which is not declared")
+				fmt.Println(d.Name, "is depending on", dep, "which is not declared")
+				os.Exit(1)
 			}
 		}
 		if _, err := os.Stat(d.Path); os.IsNotExist(err) {
-			panic(d.Name + " has a path which cannot be found: " + d.Path)
+			fmt.Println(d.Name, "has a path which can't be found:", d.Path)
+			os.Exit(1)
 		}
 	}
 }
